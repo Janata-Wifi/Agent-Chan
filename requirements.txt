@@ -1,3 +1,4 @@
 netmiko
 scapy
 browser-use
+requests
