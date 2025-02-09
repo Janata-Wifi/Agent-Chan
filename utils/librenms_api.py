@@ -1,8 +1,16 @@
 import requests
+from dotenv import load_dotenv
+import os
+from pathlib import Path
+
+# Define a relative path to your .env file
+ # .env file is in a 'config' directory one level up
+load_dotenv()
+
 class librenms_api:
-    def __init__(self, librenms_url, librenms_token):
-        self.librenms_url = librenms_url
-        self.librenms_token = librenms_token
+    def __init__(self):
+        self.librenms_url = os.environ.get("librenms_url")
+        self.librenms_token = os.environ.get("librenms_token")
 
     def fetch_alerts(self):
         """Fetch current alerts from LibreNMS."""
@@ -50,9 +58,7 @@ class librenms_api:
             return {}
 
 if __name__ == "__main__":
-    librenms_url = "https://example.com"
-    librenms_token = "foo"
-    librenms_tool = librenms_api(librenms_url, librenms_token)
+
+    librenms_tool = librenms_api()
     print(librenms_tool.fetch_alerts())
-    print(librenms_tool.fetch_eventlog("bar"))
-    print(librenms_tool.get_oxidized_config("foo"))
+    
