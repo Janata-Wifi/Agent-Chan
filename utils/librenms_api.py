@@ -1,7 +1,7 @@
 import requests
 from dotenv import load_dotenv
 import os
-from pathlib import Path
+
 
 # Define a relative path to your .env file
  # .env file is in a 'config' directory one level up
