@@ -1,19 +1,29 @@
-import utils.traceroute as traceroute
-import utils.ssh as ssh 
+import utils.traceroute as traceroute_module
+import utils.ssh as ssh_module  
+from langchain.tools import tool    
+traceroute_instance = traceroute_module.traceroute() # Instantiate Traceroute class
+ssh_instance = ssh_module.ssh_handler()
+import json
 
-
+@tool
 def traceroute(target_ip: str) -> str:
     """Perform a traceroute.
+    you can use this tool to get the traceroute result of the target ip.
+    it's useful to get the hop count and the ip address of the last hop.
 
     Args:
-        target_ip: The target IP address.
+        target_ip: The target IP address. it must be a string.
+        
 
     Returns:
         A string containing the traceroute results.
+
     """
+    target_ip = json.loads(target_ip)
+    
     try:
         
-        traceroute_result = traceroute.perform_traceroute(target_ip)  # Your actual tool function
+        traceroute_result = traceroute_instance.perform_traceroute(target_ip["target_ip"])  # Your actual tool function
         
 
         traceroute_str = "\n".join([
@@ -26,24 +36,24 @@ def traceroute(target_ip: str) -> str:
         return f"Error performing traceroute: {e}"
 
 
-
-
-def read_data_from_last_hop(last_hop_ip: str, command: str | list[str], device_type: str) -> str:
-    """Reads data from the last hop device.
+@tool
+def read_data_from_any_device(input:str):
+    """Reads data from any device.
 
     Args:
-        last_hop_ip: The IP address of the last hop, not the hostname. It has to be ip.
-        command: The command to execute on the last hop, can be a single command (str) or a list of commands (list[str]).
-        device_type: The device type for netmiko connection.
-
+        a json object with the following keys:
+        hostname: The hostname or IP address of the device.
+        command: The command to execute (str or list of str).
+        device_type: The device type for Netmiko connection.
     Returns:
-        str: The output of the command(s).
+        The output of the command(s).
     """
-    connect=ssh.netmiko_executor(hostname=last_hop_ip, device_type=device_type, command=command) # Pass command to executor
+    input = json.loads(input)   
     try:
-        output = connect.execute() # Execute command via executor - no need to pass command again here
-        return output
+        connect = ssh_instance.execute_command(input["hostname"],input["command"],input["device_type"])
+        return connect
     except Exception as e:
-        return f"Error reading data from last hop: {e}"
+        return f"Error reading data from device: {e}"
 
-    
+
+

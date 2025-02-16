@@ -1,37 +1,47 @@
+import os
+from dotenv import load_dotenv
 from netmiko import ConnectHandler
 
-class ssh_handler:
-    def __init__(self, hostname, port=22, username="admin", password="admin",device_type="mikrotik_routeros"):
-        """
-        Initialize the ssh_handler with connection parameters.
+load_dotenv()
 
-        Args:
-            hostname (str): The hostname or IP address of the device.
-            port (int, optional): The port to connect to. Defaults to 22.
-            username (str, optional): The username for authentication. Defaults to "admin".
-            password (str, optional): The password for authentication. Defaults to "admin".
+class ssh_handler:
+    def __init__(self, hostname=None, device_type=None, port=None, username=None, password=None):
         """
-        self.hostname = hostname
-        self.port = port
-        self.username = username
-        self.password = password
-        self.device_type = device_type
-    def execute_command(self, command):
+        Initialize the Netmiko SSH handler.
+        """
+        self.hostname = hostname if hostname else os.environ.get("SSH_HOSTNAME")
+        self.device_type = device_type if device_type else os.environ.get("SSH_DEVICE_TYPE")
+        self.port = port if port else os.environ.get("SSH_PORT") or 22  # Default to 22 if not in env
+        self.username = username if username else os.environ.get("SSH_USERNAME")
+        self.password = password if password else os.environ.get("SSH_PASSWORD")
+
+
+    def execute_command(self, hostname,command,device_type):
         """
         Execute a command on the device using Netmiko.
 
         Args:
             command (str or list): Command or list of commands to execute on the device.
+            hostname (str, optional): Hostname or IP address. Overrides instance hostname if provided.
+            device_type (str, optional): Device type. Overrides instance device_type if provided.
+            port (int, optional): SSH port. Overrides instance port if provided.
+            username (str, optional): SSH username. Overrides instance username if provided.
+            password (str, optional): SSH password. Overrides instance password if provided.
 
         Returns:
             str or list: Output(s) of the command(s).
         """
+        hostname = hostname # Get hostname from kwargs
+        command = command   # Get command from kwargs
+        device_type = device_type # Get device_type from kwargs
+        print(hostname,command,device_type)
+
         device = {
-            "device_type": self.device_type,
-            "host": self.hostname,
-            "port": self.port,
-            "username": self.username,
-            "password": self.password,
+            "device_type": device_type, # Use kwargs
+            "host": hostname,           # Use kwargs
+            "port": self.port,                 # Use instance attribute
+            "username": self.username,         # Use instance attribute
+            "password": self.password,         # Use instance attribute
         }
 
         try:
@@ -50,21 +60,17 @@ class ssh_handler:
 
 # Example usage
 if __name__ == "__main__":
-    # Initialize the NetmikoExecutor with connection parameters
-    input_hostname = input("Enter the hostname: ")
-    input_port = input("Enter the port: ")
-    input_username = input("Enter the username: ")
-    input_password = input("Enter the password: ")
-            
-    executor = ssh_handler(
-        hostname=input_hostname,  # Replace with your device's hostname or IP
-        port=input_port,
-        username=input_username,
-        password=input_password,
-        
-    )
+    # Initialize the NetmikoExecutor with connection parameters (or rely on env vars)
+    executor = ssh_handler() # Relying on environment variables for connection details
 
-    # Execute a command
-    command = ["ip add print","ip route print"]  # Replace with your desired command
-    output = executor.execute_command(command)
+    # Execute a command, passing connection details and command in kwargs
+    command_details = {
+        "hostname": "192.168.1.1", # Replace with your device's hostname or IP
+        "device_type": "mikrotik_routeros", # Replace with your device type
+        "command": ["ip add print", "ip route print"],  # Replace with your desired command
+        "username": "your_username", # Replace with your SSH username if not in env
+        "password": "your_password",  # Replace with your SSH password if not in env
+        "port": 22 # Replace with your SSH port if not default
+    }
+    output = executor.execute_command(**command_details) # Pass command_details as kwargs
     print(output)
