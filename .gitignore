@@ -3,7 +3,8 @@ agent_history.gif
 __pycache__/
 *.py[cod]
 *$py.class
-
+test.py
+tool_check.py
 # C extensions
 *.so
 
