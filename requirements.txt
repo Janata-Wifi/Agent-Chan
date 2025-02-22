@@ -2,3 +2,5 @@ netmiko
 scapy
 browser-use
 requests
+langchain
+langchain-google-genai

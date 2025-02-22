@@ -10,12 +10,13 @@ from dotenv import load_dotenv
 import tools.general_data_collect_and_execution
 import tools.librenms_access
 from tools.general_data_collect_and_execution import traceroute, read_data_from_any_device
+from tools.web_search import web_search
 from tools.librenms_access import fetch_alerts, fetch_logs
 
 load_dotenv()   
 api_key =  os.getenv("GEMINI_API_KEY")
 
-tools_lists = [traceroute, read_data_from_any_device, fetch_alerts, fetch_logs]
+tools_lists = [traceroute, read_data_from_any_device, fetch_alerts, fetch_logs,web_search]
 tools = tools_lists
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
@@ -55,9 +56,9 @@ agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
 result = agent_executor.invoke({
     "input": """
-check why 172.18.16.61 this device is down. you can get into last hop and gether more information.
-if you don't know device type it is a mikrotik router.
-finally give me a detailed report."""
+    
+
+"""
 })
 
 #print("Raw Agent Output:", result)
