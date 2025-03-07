@@ -1,22 +1,19 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain.tools import Tool, tool
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain.prompts import PromptTemplate
 import os
-import json
+import asyncio
 from dotenv import load_dotenv
 import tools.general_data_collect_and_execution
 import tools.librenms_access
-from tools.general_data_collect_and_execution import traceroute, read_data_from_any_device
+from tools.general_data_collect_and_execution import traceroute, ssh_into_devices
 from tools.web_search import web_search
 from tools.librenms_access import fetch_alerts, fetch_logs
 
 load_dotenv()   
 api_key =  os.getenv("GEMINI_API_KEY")
 
-tools_lists = [traceroute, read_data_from_any_device, fetch_alerts, fetch_logs,web_search]
+tools_lists = [web_search,fetch_alerts,fetch_logs,traceroute,ssh_into_devices]
 tools = tools_lists
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
@@ -56,11 +53,10 @@ agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
 result = agent_executor.invoke({
     "input": """
-    
-
+    websearch what is the capital of france?
+    second query, how many ducks are there?
 """
 })
 
-#print("Raw Agent Output:", result)
-print(StrOutputParser().parse(result))
+
 

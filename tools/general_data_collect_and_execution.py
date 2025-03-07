@@ -1,8 +1,8 @@
 import utils.traceroute as traceroute_module
-import utils.ssh as ssh_module  
+from utils.ssh import execute_command  
 from langchain.tools import tool    
 traceroute_instance = traceroute_module.traceroute() # Instantiate Traceroute class
-ssh_instance = ssh_module.ssh_handler()
+
 import json
 
 @tool
@@ -37,20 +37,22 @@ def traceroute(target_ip: str) -> str:
 
 
 @tool
-def read_data_from_any_device(input:str):
-    """Reads data from any device.
+def ssh_into_devices(input:str):
+    """Can be used to ssh into any device and execute any command and get the output of that command.
 
     Args:
         a json object with the following keys:
         hostname: The hostname or IP address of the device.
         command: The command to execute (str or list of str).
         device_type: The device type for Netmiko connection.
+        username: SSH username
+        password: SSH password
     Returns:
         The output of the command(s).
     """
     input = json.loads(input)   
     try:
-        connect = ssh_instance.execute_command(input["hostname"],input["command"],input["device_type"])
+        connect = execute_command(input["hostname"],input["command"],input["device_type"],input["username"],input["password"])
         return connect
     except Exception as e:
         return f"Error reading data from device: {e}"
