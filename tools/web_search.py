@@ -1,9 +1,7 @@
-import utils.brower_use  as browser_use
+from utils.browser  import search
 from langchain.tools import tool
 import json
-import asyncio
 
-browser_use = browser_use.browser_use()
 
 @tool
 def web_search(query: str) -> str:
@@ -19,7 +17,7 @@ def web_search(query: str) -> str:
     query =json.loads(query)
     query = query["query"]
     try:
-        web_search = asyncio.run(browser_use.execute_task(query)) 
+        web_search = search(query)
         
         return web_search
     except Exception as e:

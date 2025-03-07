@@ -1,8 +1,7 @@
-import tools.general_data_collect_and_execution
-import tools.web_search
+import tools.general_data_collect_and_execution import ssh_into_devices  
 
 
 if __name__ == "__main__":
-    
-
-    print(tools.web_search.web_search(query))
+    search='{"query":"what is he name of the capital of rome"}'
+    test=ssh_into_devices.query()
+    print(test.query(search))
